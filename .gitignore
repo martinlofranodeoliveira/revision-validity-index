@@ -1,0 +1,12 @@
+/build/
+/.gradle/
+/.kotlin/
+/.idea/
+*.iml
+*.hprof
+.DS_Store
+# Integrity records are source files, not disposable caches.
+!/gradle.lockfile
+!/buildscript-gradle.lockfile
+!/gradle/
+!/gradle/verification-metadata.xml

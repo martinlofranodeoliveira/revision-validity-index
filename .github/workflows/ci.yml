@@ -1,0 +1,31 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: gradle:8.10.2-jdk21
+    timeout-minutes: 15
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/build/gradle-home
+      JAVA_TOOL_OPTIONS: -Duser.home=${{ github.workspace }}/build/java-home -Djava.io.tmpdir=${{ github.workspace }}/build/tmp -Dfile.encoding=UTF-8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare local output directories
+        run: mkdir -p build/gradle-home build/java-home build/tmp
+      - name: Resolve from a cold Gradle home with committed integrity records
+        run: gradle --dependency-verification strict resolveDependencies testClasses
+      - name: Offline test gate
+        run: gradle --offline --dependency-verification strict test
+      - name: Separate offline demo gate
+        run: gradle --offline --dependency-verification strict --quiet demoAssert
